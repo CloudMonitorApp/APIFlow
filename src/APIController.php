@@ -4,6 +4,7 @@ namespace CloudMonitor\APIFlow;
 
 use ReflectionMethod;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
