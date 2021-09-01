@@ -1,5 +1,11 @@
 Develop RESTful API endpoints fast with rich features such as keyword querying, pagination, etc.
 
+### Install
+
+```shell
+composer require cloudmonitor/apiflow
+```
+
 ### Prepare controllers
 Similar to special attributes in Eloquent, such as $fillables, APIFlow allows for custom attributes defined as arrays. This way you can control how your data is exposed through your API.
 
