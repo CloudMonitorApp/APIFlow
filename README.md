@@ -9,7 +9,7 @@ composer require cloudmonitor/apiflow
 ### Prepare controllers
 Similar to special attributes in Eloquent, such as $fillables, APIFlow allows for custom attributes defined as arrays. This way you can control how your data is exposed through your API.
 
-Currently 2 attributes are optionally supported:
+Currently 3 attributes are supported:
 
 ```php
 /**
