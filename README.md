@@ -35,8 +35,6 @@ class UserController extends APIController
 }
 ```
 
-Keep in mind the last example is sort of syntactic sugar and won't work in most cases.
-
 #### Attributes
 
 Currently 3 attributes are supported:
