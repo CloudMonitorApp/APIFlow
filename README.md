@@ -48,7 +48,7 @@ Where the scope is:
 public function scopeDepartments(Builder $query, array $departments): void
 ```
 
-Will be cased to an array of `[1,2]`.
+Will be casted to an array of `[1,2]`.
 
 ### Available features
 
