@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace CloudMonitor\APIFlow;
 
 use ReflectionMethod;
 use Illuminate\Support\Facades\DB;
