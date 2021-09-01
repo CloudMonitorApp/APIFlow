@@ -49,6 +49,6 @@ Currently the features with APIFlow are:
 
 ### Example
 
-```
+```shell
 /api/users?query=John&exclude=4&limit=10&with=department&departments=1,3
 ```
