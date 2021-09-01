@@ -23,6 +23,13 @@ class APIController extends Controller
      * @var array
      */
     protected $scopes = [];
+    
+    /**
+     * Related models API can include.
+     * 
+     * @var array
+     */
+    protected $withRelations = [];
 
     /**
      * Mutabla query.
@@ -153,6 +160,10 @@ class APIController extends Controller
         }
 
         collect(explode(',', request()->input('with')))->each(function($name) {
+            if (! in_array($name, $this->withRelations)) {
+                return;
+            }
+
             $this->query->with($name);
         });
     }
