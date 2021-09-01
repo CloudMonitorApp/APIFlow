@@ -19,6 +19,13 @@ protected $queryColumns = ['name', 'email', 'auid'];
  * @var array
  */
 protected $scopes = ['departments'];
+
+/**
+ * Related models API can include.
+ * 
+ * @var array
+ */
+protected $withRelations = ['department'];
 ```
 
 First attribute (`queryColumns`) tells APIFlow which columns in the database it can do a full text search. Every column will be a partial search, meaning text can be surrounded to the search string (`%string%`). The string will also be lower cased to avoid case sensivity.
@@ -44,11 +51,11 @@ Currently the features with APIFlow are:
 * Keyword searchin (read above for defining columns): `query=`
 * Exlcude IDs, if you want to prevent to query something that already is displayed in ie. a list: `exclude=`
 * Set limit of results to output, with an upperlimit at 25: `limit=`
-* Load related data to the model: `with=`
+* Load related data to the model. Separated with comma: `with=`
 * Run custom scopes on the model: `scopename=`
 
 ### Example
 
 ```shell
-/api/users?query=John&exclude=4&limit=10&with=department&departments=1,3
+/api/users?query=John&exclude=4&limit=10&with=department,team&departments=1,3
 ```
