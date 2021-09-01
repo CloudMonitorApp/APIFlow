@@ -1,0 +1,27 @@
+{
+    "name": "cloudmonitor/apiflow",
+    "description": "Shortcut your RESTful API.",
+    "keywords": [
+        "laravel",
+        "api"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Emil Moe",
+            "email": "contact@cloudmonitor.dk"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5|^8.0",
+        "illuminate/support": "^7.0|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CloudMonitor\\APIFlow\\": "src/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist"
+    }
+}
