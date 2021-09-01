@@ -9,6 +9,36 @@ composer require cloudmonitor/apiflow
 ### Prepare controllers
 Similar to special attributes in Eloquent, such as $fillables, APIFlow allows for custom attributes defined as arrays. This way you can control how your data is exposed through your API.
 
+#### Methods
+
+Currently APIFlow is intended for RESTful resource listings, that be `index` or collections. It can either be done by specifically referering to a API resource and an Eloquent model:
+
+```php
+class UserController extends APIController
+{
+  public function index()
+  {
+    return parent::api(\App\Http\Resources\User::class, \App\Models\User::class);
+  }
+}
+```
+
+Or, if as above, the names are following the standard convention, that is App\Http\Controllers\\**User**Controller, \App\Http\Resources\User and \App\Models\User:
+
+```php
+class UserController extends APIController
+{
+  public function index()
+  {
+    return parent::api();
+  }
+}
+```
+
+Keep in mind the last example is sort of syntactic sugar and won't work in most cases.
+
+#### Attributes
+
 Currently 3 attributes are supported:
 
 ```php
