@@ -56,7 +56,7 @@ class APIController extends Controller
 
         return $this->predictResourceClass($resourceClass)::collection(
             request()->has('limit')
-                ? $this->query
+                ? $this->query->get()
                 : $this->query->paginate()
         );
     }
