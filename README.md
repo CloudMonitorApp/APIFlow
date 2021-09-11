@@ -18,7 +18,7 @@ class UserController extends APIController
 {
   public function index()
   {
-    return parent::api(\App\Http\Resources\User::class, \App\Models\User::class);
+    return parent::api(\App\Http\Resources\User::class, \App\Models\User::class)->many();
   }
 }
 ```
@@ -30,7 +30,19 @@ class UserController extends APIController
 {
   public function index()
   {
-    return parent::api();
+    return parent::api()->many();
+  }
+}
+```
+
+Likewise you may display a single record.
+
+```php
+class UserController extends APIController
+{
+  public function show($id)
+  {
+    return parent::api()->one($id);
   }
 }
 ```
@@ -82,9 +94,9 @@ Will be casted to an array of `[1,2]`.
 
 Currently the features with APIFlow are:
 
-* Keyword searchin (read above for defining columns): `query=`
-* Exlcude IDs, if you want to prevent to query something that already is displayed in ie. a list: `exclude=`
-* Set limit of results to output, with an upperlimit at 25: `limit=`
+* Keyword searchin (read above for defining columns): `query=` (only works on many/getIndex)
+* Exlcude IDs, if you want to prevent to query something that already is displayed in ie. a list: `exclude=` (only works on many/getIndex)
+* Set limit of results to output, with an upperlimit at 25: `limit=` (only works on many/getIndex)
 * Load related data to the model. Separated with comma: `with=`
 * Run custom scopes on the model: `scopename=`
 
