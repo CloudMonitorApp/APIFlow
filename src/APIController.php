@@ -39,26 +39,56 @@ class APIController extends Controller
     private $query;
 
     /**
-     * Run query against API.
+     * API Resource.
+     * 
+     * @var string
+     */
+    private $resourceClass;
+
+    /**
+     * Instantiate API.
      * 
      * @param string $resourceClass
      * @param string $modelClass
-     * @return mixed
+     * @return APIController
      */
-    public function api(string $resourceClass = null, string $modelClass = null): mixed
+    public function api(string $resourceClass = null, string $modelClass = null): APIController
     {
+        $this->resourceClass = $resourceClass;
         $this->query = $this->predictModelClass($modelClass)::query();
-        $this->excludeIds();
-        $this->setLimit();
-        $this->searchQuery();
         $this->loadRelationships();
         $this->modelScopes();
 
-        return $this->predictResourceClass($resourceClass)::collection(
+        return $this;
+    }
+
+    /**
+     * Resource for index page.
+     * 
+     * @return mixed
+     */
+    public function getIndex(): mixed
+    {
+        $this->excludeIds();
+        $this->setLimit();
+        $this->searchQuery();
+
+        return $this->predictResourceClass()::collection(
             request()->has('limit')
                 ? $this->query->get()
                 : $this->query->paginate()
         );
+    }
+
+    /**
+     * Resource for show page.
+     * 
+     * @return mixed
+     */
+    public function getShow(int $id): mixed
+    {
+        $resource = $this->predictResourceClass();
+        return new $resource($this->query->findOrFail($id));
     }
 
     /**
@@ -74,13 +104,12 @@ class APIController extends Controller
     /**
      * Predict resource class path from default location.
      * 
-     * @param string $resourceClass
      * @return string
      */
-    private function predictResourceClass(string $resourceClass = null): string
+    private function predictResourceClass(): string
     {
-        return $resourceClass
-            ? $resourceClass
+        return $this->resourceClass
+            ? $this->resourceClass
             : 'App\\Http\\Resources\\'. $this->basename();
     }
 
