@@ -67,7 +67,7 @@ class APIController extends Controller
      * 
      * @return mixed
      */
-    public function getIndex(): mixed
+    public function many(): mixed
     {
         $this->excludeIds();
         $this->setLimit();
@@ -81,14 +81,36 @@ class APIController extends Controller
     }
 
     /**
+     * See ->many().
+     * 
+     * @return mixed
+     */
+    
+    public function getIndex(): mixed
+    {
+        return $this->many();
+    }
+
+    /**
      * Resource for show page.
      * 
      * @return mixed
      */
-    public function getShow(int $id): mixed
+    public function one(int $id): mixed
     {
         $resource = $this->predictResourceClass();
         return new $resource($this->query->findOrFail($id));
+    }
+
+    /**
+     * See ->one().
+     * 
+     * @return mixed
+     */
+    
+    public function getShow($id): mixed
+    {
+        return $this->one($id);
     }
 
     /**
