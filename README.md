@@ -11,7 +11,7 @@ Similar to special attributes in Eloquent, such as $fillables, APIFlow allows fo
 
 #### Methods
 
-Currently APIFlow is intended for RESTful resource listings, that be `index` or collections. It can either be done by specifically referering to a API resource and an Eloquent model:
+Currently APIFlow is intended for RESTful resource listings, that be `index` or collections and single entries `show`. It can either be done by specifically referering to a API resource and an Eloquent model:
 
 ```php
 class UserController extends APIController
@@ -46,6 +46,10 @@ class UserController extends APIController
   }
 }
 ```
+
+Shortcuts available are also:
+* `->getIndex()`
+* `->getShow($id)`
 
 #### Attributes
 
