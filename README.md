@@ -103,6 +103,7 @@ Currently the features with APIFlow are:
 * Set limit of results to output, with an upperlimit at 25: `limit=` (only works on many/getIndex)
 * Load related data to the model. Separated with comma: `with=`
 * Run custom scopes on the model: `scopename=`
+* Only certain IDs (pagination won't work): `only=`
 
 ### Example
 
