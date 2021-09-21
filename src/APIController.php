@@ -70,6 +70,7 @@ class APIController extends Controller
     public function many(): mixed
     {
         $this->excludeIds();
+        $this->only();
         $this->setLimit();
         $this->searchQuery();
 
@@ -197,6 +198,24 @@ class APIController extends Controller
         }
 
         $this->query->whereNotIn('id', explode(',', request()->input('exclude')));
+    }
+
+    /**
+     * Only include IDs from list.
+     * 
+     * @return void
+     */
+    private function only(): void
+    {
+        if (! request()->has('only')) {
+            return;
+        }
+
+        if (! request()->has('limit')) {
+            request()->request->add(['limit' => 15]);
+        }
+
+        $this->query->whereIn('id', explode(',', request()->input('only')));
     }
 
     /**
