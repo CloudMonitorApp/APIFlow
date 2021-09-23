@@ -51,6 +51,24 @@ Shortcuts available are also:
 * `->getIndex()`
 * `->getShow($id)`
 
+#### Apply extra queries
+
+`apply()` can be used to apply extra filters, such IDs below 10.
+
+```php
+class UserController extends APIController
+{
+  public function index()
+  {
+    return parent::api()
+      ->apply(function(Builder $q) {
+        return $q->where('id', '<', 10);
+      })
+      ->many();
+  }
+}
+```
+
 #### Attributes
 
 Currently 3 attributes are supported:
