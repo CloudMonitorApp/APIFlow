@@ -115,6 +115,19 @@ class APIController extends Controller
     }
 
     /**
+     * Apply additional queries.
+     * 
+     * @param callable $query
+     * @return mixed
+     */
+    public function apply(callable $query): mixed
+    {
+        $this->query = $query($this->query);
+
+        return $this;
+    }
+
+    /**
      * Determine controller basename. UserController will translate to User.
      * 
      * @return string
