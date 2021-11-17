@@ -122,6 +122,7 @@ Currently the features with APIFlow are:
 * Load related data to the model. Separated with comma: `with=`
 * Run custom scopes on the model: `scopename=`
 * Only certain IDs (pagination won't work): `only=`
+* Order by columns and direction: `orderBy=id|asc,name|desc,email`
 
 ### Example
 
