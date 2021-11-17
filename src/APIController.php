@@ -30,6 +30,13 @@ class APIController extends Controller
      * @var array
      */
     protected $withRelations = [];
+    
+    /**
+     * Order by columns.
+     *
+     * @var array
+     */
+    protected $orderBy;
 
     /**
      * Mutabla query.
@@ -44,13 +51,6 @@ class APIController extends Controller
      * @var string
      */
     private $resourceClass;
-    
-    /**
-     * Order by columns.
-     *
-     * @var array
-     */
-    private $orderBy;
 
     /**
      * Instantiate API.
