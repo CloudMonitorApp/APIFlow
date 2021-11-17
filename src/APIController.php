@@ -257,7 +257,7 @@ class APIController extends Controller
     private function checkParams(string $identifier, mixed $default = null): mixed
     {
         if (! request()->has($identifier) && ! $default) {
-            return;
+            return null;
         }
         
         if (request()->has($identifier)) {
