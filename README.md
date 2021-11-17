@@ -127,5 +127,5 @@ Currently the features with APIFlow are:
 ### Example
 
 ```shell
-/api/users?query=John&exclude=4&limit=10&with=department,team&departments=1,3
+/api/users?query=John&exclude=4&limit=10&with=department,team&departments=1,3&orderBy=name
 ```
