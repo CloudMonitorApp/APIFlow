@@ -44,6 +44,13 @@ class APIController extends Controller
      * @var string
      */
     private $resourceClass;
+    
+    /**
+     * Order by columns.
+     *
+     * @var array
+     */
+    private $orderBy;
 
     /**
      * Instantiate API.
@@ -73,6 +80,7 @@ class APIController extends Controller
         $this->only();
         $this->setLimit();
         $this->searchQuery();
+        $this->orderBy();
 
         return $this->predictResourceClass()::collection(
             request()->has('limit')
@@ -211,6 +219,28 @@ class APIController extends Controller
         }
 
         $this->query->whereNotIn('id', explode(',', request()->input('exclude')));
+    }
+    
+    /**
+     * Order output.
+     *
+     * @return void
+     */
+    private function orderBy(): void
+    {
+        if (! request()->has('order')) {
+            return;
+        }
+        
+        collect(explode(',', request()->input('orderBy')))->each(function($param) {
+            @list($column, $direction) = explode('|', $param);
+            
+            if (! in_array($column, $this->orderBy)) {
+                return;
+            }
+            
+            $this->query->orderBy($column, $direction ?? 'asc');
+        });
     }
 
     /**
