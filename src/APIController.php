@@ -227,13 +227,9 @@ class APIController extends Controller
      * @param array $default
      * @return void
      */
-    private function orderBy(array $default = null): void
+    private function orderBy(string $default = ''): void
     {
         $params = $this->checkParams('orderBy', $default);
-        
-        if (! $params) {
-            return;
-        }
         
         collect(explode(',', $params))->each(function($param) {
             @list($column, $direction) = explode('|', $param);
