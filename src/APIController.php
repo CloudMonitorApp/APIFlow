@@ -2,6 +2,7 @@
 
 namespace CloudMonitor\APIFlow;
 
+use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -237,8 +238,18 @@ class APIController extends Controller
             if (! in_array($column, $this->orderBy)) {
                 return;
             }
-            
-            $this->query->orderBy($column, $direction ?? 'asc');
+
+            try {
+                $r = (new ReflectionClass($this->query->getModel()::class))->getProperty('translatable');
+                $r->setAccessible(true);
+
+                in_array($column, $r->getValue(new ($this->query->getModel()::class)))
+                    ? $this->query->orderByTranslation($column, $direction ?? 'asc')
+                    : $this->query->orderBy($column, $direction ?? 'asc');
+            }
+            catch (\ReflectionException $e) {
+                $this->query->orderBy($column, $direction ?? 'asc');
+            }
         });
     }
     
