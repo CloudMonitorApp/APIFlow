@@ -74,13 +74,13 @@ class APIController extends Controller
      * 
      * @return mixed
      */
-    public function many(): mixed
+    public function many(array $defaults = []): mixed
     {
         $this->excludeIds();
         $this->only();
         $this->setLimit();
         $this->searchQuery();
-        $this->orderBy();
+        $this->orderBy($defaults['orderBy'] ?? null);
 
         return $this->predictResourceClass()::collection(
             request()->has('limit')
@@ -224,15 +224,18 @@ class APIController extends Controller
     /**
      * Order output.
      *
+     * @param array $default
      * @return void
      */
-    private function orderBy(): void
+    private function orderBy(array $default = null): void
     {
-        if (! request()->has('order')) {
+        $params = $this->checkParams('orderBy', $default);
+        
+        if (! $params) {
             return;
         }
         
-        collect(explode(',', request()->input('orderBy')))->each(function($param) {
+        collect(explode(',', $params))->each(function($param) {
             @list($column, $direction) = explode('|', $param);
             
             if (! in_array($column, $this->orderBy)) {
@@ -241,6 +244,27 @@ class APIController extends Controller
             
             $this->query->orderBy($column, $direction ?? 'asc');
         });
+    }
+    
+    /**
+     * Check if parameter is present or default value should be used.
+     * Or null in case neither is present.
+     *
+     * @param string $identifier
+     * @param mixed $default
+     * @return mixed
+     */
+    private function checkParams(string $identifier, mixed $default = null): mixed
+    {
+        if (! request()->has($identifier) && ! $default) {
+            return;
+        }
+        
+        if (request()->has($identifier)) {
+            return request()->input($identifier);
+        }
+        
+        return $default;
     }
 
     /**
