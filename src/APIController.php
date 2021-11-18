@@ -82,7 +82,7 @@ class APIController extends Controller
         $this->setLimit();
         $this->searchQuery();
         $this->orderBy($defaults['orderBy'] ?? null);
-
+        
         return $this->predictResourceClass()::collection(
             request()->has('limit')
                 ? $this->query->get()
@@ -201,9 +201,25 @@ class APIController extends Controller
             return;
         }
 
-        $this->query->where(function(Builder $query) {
+        /*$this->query->where(function(Builder $query) {
             collect($this->queryColumns)->each(function($column) use(&$query) {
                 $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+            });
+        });*/
+
+        $this->query->where(function(Builder $query) {
+            collect($this->queryColumns)->each(function($column) use(&$query) {
+                try {
+                    $r = (new ReflectionClass($this->query->getModel()::class))->getProperty('translatable');
+                    $r->setAccessible(true);
+    
+                    in_array($column, $r->getValue(new ($this->query->getModel()::class)))
+                        ? $this->query->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%')
+                        : $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                }
+                catch (\ReflectionException $e) {
+                    $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                }
             });
         });
     }
