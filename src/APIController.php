@@ -244,14 +244,14 @@ class APIController extends Controller
      * @param array $default
      * @return void
      */
-    private function orderBy(string $default = ''): void
+    private function orderBy(?string $default = ''): void
     {
         $params = $this->checkParams('orderBy', $default);
         
         collect(explode(',', $params))->each(function($param) {
             @list($column, $direction) = explode('|', $param);
             
-            if (! in_array($column, $this->orderBy)) {
+            if (! in_array($column, $this->orderBy ?? [])) {
                 return;
             }
 
@@ -277,7 +277,7 @@ class APIController extends Controller
      * @param mixed $default
      * @return mixed
      */
-    private function checkParams(string $identifier, mixed $default = null): mixed
+    private function checkParams(string $identifier, mixed $default = ''): mixed
     {
         if (! request()->has($identifier) && ! $default) {
             return null;
