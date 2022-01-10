@@ -54,6 +54,14 @@ class APIController extends Controller
     private $resourceClass;
 
     /**
+     * @param array $params
+     */
+    public function __construct($params = [])
+    {
+        request()->request->add($params);
+    }
+
+    /**
      * Instantiate API.
      * 
      * @param string $resourceClass
@@ -200,12 +208,6 @@ class APIController extends Controller
         if (! request()->has('query')) {
             return;
         }
-
-        /*$this->query->where(function(Builder $query) {
-            collect($this->queryColumns)->each(function($column) use(&$query) {
-                $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
-            });
-        });*/
 
         $this->query->where(function(Builder $query) {
             collect($this->queryColumns)->each(function($column) use(&$query) {
