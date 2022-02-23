@@ -261,7 +261,7 @@ class APIController extends Controller
             $r->setAccessible(true);
 
             in_array($column, $r->getValue(new ($class)))
-                ? $this->query->orWhereHas($table, function(Builder $q) use($column, $table) {
+                ? $query->orWhereHas($table, function(Builder $q) use($column, $table) {
                     $q->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%');
                 })
                 : $query->orWhereHas($table, function(Builder $q) use($column) {
