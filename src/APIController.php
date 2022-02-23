@@ -337,8 +337,14 @@ class APIController extends Controller
      */
     private function modelScopes(): void
     {
-        collect($this->scopes)->each(function($scope) {
-            if (! request()->has($scope)) {
+        if (! request()->has('scopes')) {
+            return;
+        }
+
+        $scopes = explode(',', request()->input('scopes'));
+        
+        collect($this->scopes)->each(function($scope) use($scopes) {
+            if (! in_array($scope, $scopes)) {
                 return;
             }
 
