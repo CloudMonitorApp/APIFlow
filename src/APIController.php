@@ -211,19 +211,68 @@ class APIController extends Controller
 
         $this->query->where(function(Builder $query) {
             collect($this->queryColumns)->each(function($column) use(&$query) {
-                try {
-                    $r = (new ReflectionClass($this->query->getModel()::class))->getProperty('translatable');
-                    $r->setAccessible(true);
-    
-                    in_array($column, $r->getValue(new ($this->query->getModel()::class)))
-                        ? $this->query->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%')
-                        : $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
-                }
-                catch (\ReflectionException $e) {
-                    $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
-                }
+                strpos($column, '.')
+                    ? $this->searchForeign(
+                        $query,
+                        explode('.', $column)[0],
+                        explode('.', $column)[1]
+                    )
+                    : $this->searchLocal($query, $column);
             });
         });
+    }
+
+    /**
+     * Search in local table.
+     * 
+     * @param Builder $query
+     * @param string $column
+     * @return void
+     */
+    private function searchLocal(Builder $query, string $column): void
+    {
+        try {
+            $class = $this->query->getModel()::class;
+            $r = (new ReflectionClass($class))->getProperty('translatable');
+            $r->setAccessible(true);
+
+            in_array($column, $r->getValue(new ($class)))
+                ? $this->query->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%')
+                : $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+        }
+        catch (\ReflectionException $e) {
+            $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+        }
+    }
+
+    /**
+     * Search in related tables.
+     * 
+     * @param Builder $query
+     * @param string $table
+     * @param string $column
+     * @return void
+     */
+    private function searchForeign(Builder $query, string $table, string $column): void
+    {
+        try {
+            $class = (new ($this->query->getModel()::class))->{$table}()->getRelated();
+            $r = (new ReflectionClass($class))->getProperty('translatable');
+            $r->setAccessible(true);
+
+            in_array($column, $r->getValue(new ($class)))
+                ? $this->query->orWhereHas($table, function(Builder $q) use($column, $table) {
+                    $q->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%');
+                })
+                : $query->orWhereHas($table, function(Builder $q) use($column) {
+                    $q->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                });
+        }
+        catch (\ReflectionException $e) {
+            $query->orWhereHas($table, function(Builder $q) use($column) {
+                $q->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+            });
+        }
     }
 
     /**
