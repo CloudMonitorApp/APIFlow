@@ -211,13 +211,16 @@ class APIController extends Controller
 
         $this->query->where(function(Builder $query) {
             collect($this->queryColumns)->each(function($column) use(&$query) {
-                strpos($column, '.')
+                strpos($column, '.') !== false
                     ? $this->searchForeign(
                         $query,
                         explode('.', $column)[0],
                         explode('.', $column)[1]
                     )
-                    : $this->searchLocal($query, $column);
+                    : (strpos($column, 'scope:') !== false
+                        ? $this->searchScope($query, $column)
+                        : $this->searchLocal($query, $column)
+                    );
             });
         });
     }
@@ -273,6 +276,48 @@ class APIController extends Controller
                 $q->where(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
             });
         }
+    }
+
+    /**
+     * Use scope for advanced search options.
+     * 
+     * @param Builder $query
+     * @param string $scope
+     * @return void
+     */
+    private function searchScope(Builder $query, string $scope): void
+    {
+        preg_match('/^scope:([a-zA-Z0-9]+),?(.*)/', $scope, $matches);
+        $scope = $matches[1];
+
+        $class = new ReflectionClass($this->query->getModel()::class);
+        $method = $class->getMethod('scope'. ucfirst($scope));
+
+        $params = collect(explode(',', $matches[2]))->map(function($param) use($method) {
+            if (! request()->has($param)) {
+                return null;
+            }
+
+            $type = collect($method->getParameters())->first(function($p) use($param) {
+                return $p->name === $param;
+            })->getType()->getName() ?? 'string';
+
+            if ($type === 'array') {
+                return explode(',', request()->input($param));
+            }
+
+            if ($type === 'int') {
+                return (int) request()->input($param);
+            }
+
+            if ($type === 'bool') {
+                return (bool) request()->input($param);
+            }
+
+            return request()->input($param);
+        });
+
+        $query->{$matches[1]}(request()->input('query'), ...$params->toArray());
     }
 
     /**
