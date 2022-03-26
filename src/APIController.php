@@ -270,7 +270,7 @@ class APIController extends Controller
         }
         catch (\ReflectionException $e) {
             $query->orWhereHas($table, function(Builder $q) use($column) {
-                $q->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                $q->where(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
             });
         }
     }
