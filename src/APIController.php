@@ -2,6 +2,7 @@
 
 namespace CloudMonitor\APIFlow;
 
+use Closure;
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\DB;
@@ -90,9 +91,13 @@ class APIController extends Controller
         $this->setLimit();
         $this->searchQuery();
         $this->orderBy($defaults['orderBy'] ?? null);
-        
+
+        #if ($this->applied) {
+        #    $this->query = call_user_func($this->applied, $this->query);
+        #}
+
         return $this->predictResourceClass()::collection(
-            request()->has('limit')
+            request()->request->has('limit')
                 ? $this->query->get()
                 : $this->query->paginate()
         );
@@ -137,9 +142,10 @@ class APIController extends Controller
      * @param callable $query
      * @return mixed
      */
-    public function apply(callable $query): mixed
+    public function apply(callable $scope): APIController
     {
-        $this->query = $query($this->query);
+        #$this->applied = $scope;
+        $this->query = $scope($this->query);
 
         return $this;
     }
@@ -186,12 +192,12 @@ class APIController extends Controller
      */
     private function setLimit(): void
     {
-        if (! request()->has('limit')) {
+        if (! request()->request->has('limit')) {
             return;
         }
 
-        $limit = request()->input('limit') <= 25
-            ? request()->input('limit')
+        $limit = request()->request->get('limit') <= 25
+            ? request()->request->get('limit')
             : 25;
 
         $this->query->limit($limit);
@@ -205,7 +211,7 @@ class APIController extends Controller
      */
     private function searchQuery(): void
     {
-        if (! request()->has('query')) {
+        if (! request()->request->has('query')) {
             return;
         }
 
@@ -240,11 +246,11 @@ class APIController extends Controller
             $r->setAccessible(true);
 
             in_array($column, $r->getValue(new ($class)))
-                ? $this->query->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%')
-                : $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                ? $this->query->orWhereTranslation($column, 'LIKE', '%'. request()->request->get('query') .'%')
+                : $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->request->get('query')) .'%');
         }
         catch (\ReflectionException $e) {
-            $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+            $query->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->request->get('query')) .'%');
         }
     }
 
@@ -265,15 +271,15 @@ class APIController extends Controller
 
             in_array($column, $r->getValue(new ($class)))
                 ? $query->orWhereHas($table, function(Builder $q) use($column, $table) {
-                    $q->orWhereTranslation($column, 'LIKE', '%'. request()->input('query') .'%');
+                    $q->orWhereTranslation($column, 'LIKE', '%'. request()->request->get('query') .'%');
                 })
                 : $query->orWhereHas($table, function(Builder $q) use($column) {
-                    $q->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                    $q->orWhere(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->request->get('query')) .'%');
                 });
         }
         catch (\ReflectionException $e) {
             $query->orWhereHas($table, function(Builder $q) use($column) {
-                $q->where(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->input('query')) .'%');
+                $q->where(DB::raw('LOWER('. $column .')'), 'LIKE', '%'. strtolower(request()->request->get('query')) .'%');
             });
         }
     }
@@ -294,7 +300,7 @@ class APIController extends Controller
         $method = $class->getMethod('scope'. ucfirst($scope));
 
         $params = collect(explode(',', $matches[2]))->map(function($param) use($method) {
-            if (! request()->has($param)) {
+            if (! request()->request->has($param)) {
                 return null;
             }
 
@@ -303,21 +309,21 @@ class APIController extends Controller
             })->getType()->getName() ?? 'string';
 
             if ($type === 'array') {
-                return explode(',', request()->input($param));
+                return explode(',', request()->request->get($param));
             }
 
             if ($type === 'int') {
-                return (int) request()->input($param);
+                return (int) request()->request->get($param);
             }
 
             if ($type === 'bool') {
-                return (bool) request()->input($param);
+                return (bool) request()->request->get($param);
             }
 
-            return request()->input($param);
+            return request()->request->get($param);
         });
 
-        $query->{$matches[1]}(request()->input('query'), ...$params->toArray());
+        $query->{$matches[1]}(request()->request->get('query'), ...$params->toArray());
     }
 
     /**
@@ -327,11 +333,11 @@ class APIController extends Controller
      */
     private function excludeIds(): void
     {
-        if (! request()->has('exclude')) {
+        if (! request()->request->has('exclude')) {
             return;
         }
 
-        $this->query->whereNotIn('id', explode(',', request()->input('exclude')));
+        $this->query->whereNotIn('id', explode(',', request()->request->get('exclude')));
     }
     
     /**
@@ -375,12 +381,12 @@ class APIController extends Controller
      */
     private function checkParams(string $identifier, mixed $default = ''): mixed
     {
-        if (! request()->has($identifier) && ! $default) {
+        if (! request()->request->has($identifier) && ! $default) {
             return null;
         }
         
-        if (request()->has($identifier)) {
-            return request()->input($identifier);
+        if (request()->request->has($identifier)) {
+            return request()->request->get($identifier);
         }
         
         return $default;
@@ -393,15 +399,15 @@ class APIController extends Controller
      */
     private function only(): void
     {
-        if (! request()->has('only')) {
+        if (! request()->request->has('only')) {
             return;
         }
 
-        if (! request()->has('limit')) {
+        if (! request()->request->has('limit')) {
             request()->request->add(['limit' => 15]);
         }
 
-        $this->query->whereIn('id', explode(',', request()->input('only')));
+        $this->query->whereIn('id', explode(',', request()->request->get('only')));
     }
 
     /**
@@ -411,11 +417,11 @@ class APIController extends Controller
      */
     private function loadRelationships(): void
     {
-        if (! request()->has('with')) {
+        if (! request()->request->has('with')) {
             return;
         }
 
-        collect(explode(',', request()->input('with')))->each(function($name) {
+        collect(explode(',', request()->request->get('with')))->each(function($name) {
             if (! in_array($name, $this->withRelations)) {
                 return;
             }
@@ -432,7 +438,7 @@ class APIController extends Controller
     private function modelScopes(): void
     {
         collect($this->scopes)->each(function($scope) {
-            if (! request()->has($scope)) {
+            if (! request()->request->has($scope)) {
                 return;
             }
 
@@ -464,7 +470,7 @@ class APIController extends Controller
         $type = $this->scopeParameters($scope)[1]->getType()->getName();
 
         if ($type === 'array') {
-            $array = explode(',', request()->input($scope));
+            $array = explode(',', request()->request->get($scope));
 
             return count($array) === 1 && $array[0] === ''
                 ? []
@@ -472,13 +478,13 @@ class APIController extends Controller
         }
 
         if ($type === 'int') {
-            return (int) request()->input($scope);
+            return (int) request()->request->get($scope);
         }
 
         if ($type === 'bool') {
-            return (bool) request()->input($scope);
+            return (bool) request()->request->get($scope);
         }
 
-        return request()->input($scope);
+        return request()->request->get($scope);
     }
 }
