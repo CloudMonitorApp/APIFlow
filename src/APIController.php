@@ -434,7 +434,7 @@ class APIController extends Controller
     private function modelScopes(): void
     {
         collect($this->scopes)->each(function($scope) {
-            if (! request()->has($scope)) {
+            if (! request()->request->has($scope)) {
                 return;
             }
 
@@ -466,7 +466,7 @@ class APIController extends Controller
         $type = $this->scopeParameters($scope)[1]->getType()->getName();
 
         if ($type === 'array') {
-            $array = explode(',', request()->input($scope));
+            $array = explode(',', request()->request->get($scope));
 
             return count($array) === 1 && $array[0] === ''
                 ? []
@@ -474,13 +474,13 @@ class APIController extends Controller
         }
 
         if ($type === 'int') {
-            return (int) request()->input($scope);
+            return (int) request()->request->get($scope);
         }
 
         if ($type === 'bool') {
-            return (bool) request()->input($scope);
+            return (bool) request()->request->get($scope);
         }
 
-        return request()->input($scope);
+        return request()->request->get($scope);
     }
 }
