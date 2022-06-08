@@ -413,11 +413,11 @@ class APIController extends Controller
      */
     private function loadRelationships(): void
     {
-        if (! request()->has('with')) {
+        if (! request()->request->has('with')) {
             return;
         }
 
-        collect(explode(',', request()->input('with')))->each(function($name) {
+        collect(explode(',', request()->request->get('with')))->each(function($name) {
             if (! in_array($name, $this->withRelations)) {
                 return;
             }
