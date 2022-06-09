@@ -59,7 +59,7 @@ class APIController extends Controller
      */
     public function __construct($params = [])
     {
-        request()->request->add($params);
+        request()->merge($params);
     }
 
     /**
@@ -400,7 +400,7 @@ class APIController extends Controller
         }
 
         if (! request()->has('limit')) {
-            request()->request->add(['limit' => 15]);
+            request()->merge(['limit' => 15]);
         }
 
         $this->query->whereIn('id', explode(',', request()->input('only')));
@@ -413,11 +413,11 @@ class APIController extends Controller
      */
     private function loadRelationships(): void
     {
-        if (! request()->request->has('with')) {
+        if (! request()->has('with')) {
             return;
         }
 
-        collect(explode(',', request()->request->get('with')))->each(function($name) {
+        collect(explode(',', request()->input('with')))->each(function($name) {
             if (! in_array($name, $this->withRelations)) {
                 return;
             }
@@ -434,7 +434,7 @@ class APIController extends Controller
     private function modelScopes(): void
     {
         collect($this->scopes)->each(function($scope) {
-            if (! request()->request->has($scope)) {
+            if (! request()->has($scope)) {
                 return;
             }
 
@@ -466,7 +466,7 @@ class APIController extends Controller
         $type = $this->scopeParameters($scope)[1]->getType()->getName();
 
         if ($type === 'array') {
-            $array = explode(',', request()->request->get($scope));
+            $array = explode(',', request()->input($scope));
 
             return count($array) === 1 && $array[0] === ''
                 ? []
@@ -474,13 +474,13 @@ class APIController extends Controller
         }
 
         if ($type === 'int') {
-            return (int) request()->request->get($scope);
+            return (int) request()->input($scope);
         }
 
         if ($type === 'bool') {
-            return (bool) request()->request->get($scope);
+            return (bool) request()->input($scope);
         }
 
-        return request()->request->get($scope);
+        return request()->input($scope);
     }
 }
