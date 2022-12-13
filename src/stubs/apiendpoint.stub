@@ -2,8 +2,8 @@
 
 namespace App\Http\API;
 
-use CloudMonitor\APIFlow\APIController;
 use Illuminate\Http\Request;
+use CloudMonitor\APIFlow\APIController;
 
 class {NAME} extends APIController
 {
