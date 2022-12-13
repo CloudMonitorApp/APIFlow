@@ -36,9 +36,9 @@ class APIController extends Controller
     /**
      * Order by columns.
      *
-     * @var array
+     * @var null|array
      */
-    protected $orderBy;
+    protected $orderBy = null;
 
     /**
      * Mutabla query.
