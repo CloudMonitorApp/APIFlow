@@ -1,10 +1,7 @@
 {
     "name": "cloudmonitor/apiflow",
     "description": "Shortcut your RESTful API.",
-    "keywords": [
-        "laravel",
-        "api"
-    ],
+    "keywords": ["laravel", "api"],
     "license": "MIT",
     "authors": [
         {
@@ -21,7 +18,11 @@
             "CloudMonitor\\APIFlow\\": "src/"
         }
     },
-    "config": {
-        "preferred-install": "dist"
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CloudMonitor\\APIFlow\\APIFlowServiceProvider"
+            ]
+        }
     }
 }
