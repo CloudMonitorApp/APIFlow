@@ -42,7 +42,7 @@ class {NAME} extends APIController
      */
     public function index()
     {
-        //
+        // return parent::api()->many();
     }
 
     /**
@@ -64,7 +64,7 @@ class {NAME} extends APIController
      */
     public function show($id)
     {
-        //
+        // return parent::api()->one($id);
     }
 
     /**
