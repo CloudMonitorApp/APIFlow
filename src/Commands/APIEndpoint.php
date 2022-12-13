@@ -27,10 +27,51 @@ class APIEndpoint extends Command
      */
     public function handle()
     {
+        $this->checkFolder();
+
+        if ($this->isDuplicate()) {
+            return Command::FAILURE;
+        }
+
+        $this->create();
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * If API folder does't exist, create it.
+     * 
+     * @return void
+     */
+    private function checkFolder(): void
+    {
         if (! is_dir(app_path('Http/API'))) {
             mkdir(app_path('Http/API'));
         }
+    }
 
+    /**
+     * Check if API Controller is already existing.
+     * 
+     * @return bool
+     */
+    private function isDuplicate(): bool
+    {
+        if (is_file(app_path('Http/API/'. $this->argument('name') .'.php'))) {
+            $this->components->error('API Controller ['. app_path('Http/API/'. $this->argument('name') .'.php') .'] already exists.');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Create API Controller.
+     * 
+     * @return void
+     */
+    private function create(): void
+    {
         $stub = str_replace(
             '{NAME}',
             $this->argument('name'),
@@ -39,6 +80,6 @@ class APIEndpoint extends Command
 
         file_put_contents(app_path('Http/API/'. $this->argument('name') .'.php'), $stub);
 
-        return Command::SUCCESS;
+        $this->components->info('API Controller ['. app_path('Http/API/'. $this->argument('name') .'.php') .'] created successfully.');
     }
 }
