@@ -2,7 +2,6 @@
 
 namespace CloudMonitor\APIFlow;
 
-use Closure;
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +35,9 @@ class APIController extends Controller
     /**
      * Order by columns.
      *
-     * @var null|array
+     * @var array
      */
-    protected $orderBy = null;
+    protected $orderBy;
 
     /**
      * Mutabla query.
@@ -77,6 +76,17 @@ class APIController extends Controller
         $this->modelScopes();
 
         return $this;
+    }
+
+    /**
+     * Get predicted model.
+     * Only works for default setup with no custom model.
+     * 
+     * @return string
+     */
+    public function model(): string
+    {
+        return $this->predictModelClass();
     }
 
     /**
@@ -126,7 +136,6 @@ class APIController extends Controller
      * 
      * @return mixed
      */
-    
     public function getShow($id): mixed
     {
         return $this->one($id);
