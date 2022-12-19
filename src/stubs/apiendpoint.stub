@@ -88,7 +88,7 @@ class {NAME} extends APIController
      */
     public function update(Request $request, {MODEL} ${model})
     {
-        return parent::change(${model});
+        return parent::change(${model}, $request);
     }
 
     /**
