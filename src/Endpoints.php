@@ -36,7 +36,7 @@ trait Endpoints
                 ? $this->query->get()
                 : $this->query->paginate(),
             $this->predictResourceClass(),
-            $this->predictModelClass()
+            $this->model()
         );
 
         return $collection;
@@ -47,8 +47,8 @@ trait Endpoints
      */
     public function make(Request $request = null)
     {
-        $user = \App\Models\User::create($request ? $request->all() : request()->all());
-        return $this->one($user->id);
+        $object = $this->model()::create($request ? $request->all() : request()->all());
+        return $this->one($object->id);
     }
 
     /**

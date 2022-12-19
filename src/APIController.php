@@ -72,6 +72,8 @@ class APIController extends Controller
      */
     private $resourceClass;
 
+    private $modelClass;
+
     /**
      * @param array $params
      */
@@ -79,7 +81,8 @@ class APIController extends Controller
     {
         request()->merge($params);
         $this->resourceClass = $resourceClass;
-        $this->query = $this->predictModelClass($modelClass)::query();
+        $this->modelClass = $modelClass;
+        $this->query = $this->model()::query();
         $this->loadRelationships();
         $this->modelScopes();
     }
@@ -92,7 +95,9 @@ class APIController extends Controller
      */
     public function model(): string
     {
-        return $this->predictModelClass();
+        return $this->modelClass
+            ? $this->modelClass
+            :  'App\\Models\\'. $this->basename();
     }
 
     /**
@@ -137,18 +142,5 @@ class APIController extends Controller
         return $this->resourceClass
             ? $this->resourceClass
             : 'App\\Http\\Resources\\'. $this->basename();
-    }
-
-    /**
-     * Predict model class path from default location.
-     * 
-     * @param string $modelClass
-     * @return string
-     */
-    private function predictModelClass(string $modelClass = null): string
-    {
-        return $modelClass
-            ? $modelClass
-            :  'App\\Models\\'. $this->basename();
     }
 }
