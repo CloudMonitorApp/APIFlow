@@ -30,7 +30,7 @@ class UserController extends APIController
 {
   public function index()
   {
-    return parent::api()->many();
+    return parent::many();
   }
 }
 ```
@@ -42,7 +42,7 @@ class UserController extends APIController
 {
   public function show($id)
   {
-    return parent::api()->one($id);
+    return parent::one($id);
   }
 }
 ```
@@ -60,8 +60,7 @@ class UserController extends APIController
 {
   public function index()
   {
-    return parent::api()
-      ->apply(function(Builder $q) {
+    return parent::apply(function(Builder $q) {
         return $q->where('id', '<', 10);
       })
       ->many();
