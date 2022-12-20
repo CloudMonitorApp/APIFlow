@@ -14,6 +14,8 @@ class APICollection extends ResourceCollection
      */
     private $model;
 
+    private $meta = [];
+
     /**
      * Create a new resource instance.
      *
@@ -27,6 +29,10 @@ class APICollection extends ResourceCollection
         $this->collects = $resourceClass;
         $this->model = $model;
         parent::__construct($resource);
+
+        if (method_exists($this, 'meta')) {
+            $this->meta = $this->meta();
+        }
     }
 
     /**
@@ -42,6 +48,7 @@ class APICollection extends ResourceCollection
                 'create' => Auth::user()->can('create', $this->model),
                 'viewAny' => Auth::user()->can('viewAny', $this->model),
             ],
+            'meta' => $this->meta,
         ];
     }
 }
