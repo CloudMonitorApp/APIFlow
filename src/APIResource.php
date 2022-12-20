@@ -2,6 +2,7 @@
 
 namespace CloudMonitor\APIFlow;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -33,13 +34,13 @@ class APIResource extends JsonResource
     /**
      * Transform the resource into an api array.
      *
-     * @param  array  $properties
+     * @param  array|Request  $properties
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toApi(array $properties)
+    public function toApi(array|Request $properties)
     {
         return array_merge(
-            $properties,
+            is_array($properties) ? $properties : parent::toArray($properties),
             ['can' => $this->whenNotNull($this->can)]
         );
     }
