@@ -16,11 +16,9 @@ class APIResource extends JsonResource
      */
     public function __construct($resource)
     {
-        foreach ($resource->getOriginal() as $key => $value) {
-            if (substr($key, 0, 6) === 'pivot_') {
-                parent::__construct($resource);
-                return;
-            }
+        if ($this->isPivot($resource)) {
+            parent::__construct($resource);
+            return;
         }
 
         $resource->can = [
@@ -43,5 +41,22 @@ class APIResource extends JsonResource
             is_array($properties) ? $properties : parent::toArray($properties),
             ['can' => $this->whenNotNull($this->can)]
         );
+    }
+
+    /**
+     * Check if the current resource is a pivot on a different resource.
+     * 
+     * @param  mixed  $resource
+     * @return bool
+     */
+    private function isPivot($resource)
+    {
+        foreach ($resource->getOriginal() as $key => $value) {
+            if (substr($key, 0, 6) === 'pivot_') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
