@@ -56,7 +56,7 @@ trait Endpoints
      */
     public function change(Model $model, $request = null)
     {
-        $model->update($request ?? request()->all());
+        $model->update($request ? $request->all() : request()->all());
         return $this->one($model->id);
     }
 
