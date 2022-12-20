@@ -31,7 +31,11 @@ trait Endpoints
         $this->searchQuery();
         $this->orderBy();
 
-        $collection = new APICollection(
+        $class = class_exists($this->predictResourceClass() .'Collection')
+            ? $this->predictResourceClass() .'Collection'
+            : 'APICollection';
+
+        $collection = new $class(
             request()->has('limit')
                 ? $this->query->get()
                 : $this->query->paginate(),
