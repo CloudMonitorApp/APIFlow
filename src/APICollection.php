@@ -14,6 +14,11 @@ class APICollection extends ResourceCollection
      */
     private $model;
 
+    /**
+     * Additional metadata for collection.
+     * 
+     * @var array
+     */
     private $meta = [];
 
     /**
