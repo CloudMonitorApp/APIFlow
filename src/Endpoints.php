@@ -33,7 +33,7 @@ trait Endpoints
 
         $class = class_exists($this->predictResourceClass() .'Collection')
             ? $this->predictResourceClass() .'Collection'
-            : 'APICollection';
+            : '\CloudMonitor\APIFlow\APICollection';
 
         $collection = new $class(
             request()->has('limit')
