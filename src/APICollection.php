@@ -50,8 +50,8 @@ class APICollection extends ResourceCollection
     {
         return [
             'can' => [
-                'create' => Auth::user()->can('create', $this->model),
-                'viewAny' => Auth::user()->can('viewAny', $this->model),
+                'create' => Auth::check() ? Auth::user()->can('create', $this->model) : false,
+                'viewAny' => Auth::check() ? Auth::user()->can('viewAny', $this->model) : false,
             ],
             'meta' => $this->meta,
         ];
