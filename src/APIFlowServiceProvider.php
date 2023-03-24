@@ -29,5 +29,9 @@ class APIFlowServiceProvider extends ServiceProvider
         });
 
         $this->commands(['command.makeapi']);
+
+        \Illuminate\Routing\Router::macro('api', function($path, $controller) {
+            return \Illuminate\Support\Facades\Route::resource($path, $controller);
+        });
     }
 }
