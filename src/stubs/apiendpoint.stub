@@ -2,6 +2,7 @@
 
 namespace App\Http\API;
 
+use {NAMESPACE};
 use Illuminate\Http\Request;
 use CloudMonitor\APIFlow\APIController;
 

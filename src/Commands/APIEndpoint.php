@@ -2,6 +2,7 @@
 
 namespace CloudMonitor\APIFlow\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
@@ -18,6 +19,7 @@ class APIEndpoint extends Command
         {--P|policy    : Create policy class.}
         {--M|model     : Create model class.}
         {--R|resource  : Create resource class.}
+        {--U|route     : Create route.}
     ';
 
     /**
@@ -80,8 +82,8 @@ class APIEndpoint extends Command
     private function create(): void
     {
         $stub = str_replace(
-            ['{NAME}', '{MODEL}', '{model}'],
-            [$this->argument('name'), $this->modelClass(), $this->modelParameter()],
+            ['{NAME}', '{MODEL}', '{model}', '{NAMESPACE}'],
+            [$this->argument('name'), $this->modelClass(), $this->modelParameter(), 'App\\Models\\'. $this->modelClass()],
             file_get_contents(dirname(__DIR__) .'/stubs/apiendpoint.stub')
         );
 
@@ -119,6 +121,14 @@ class APIEndpoint extends Command
 
         if ($this->option('model')) {
             Artisan::call('make:model '. $this->modelClass());
+        }
+
+        if ($this->option('route')) {
+            file_put_contents(
+                base_path('/routes/api.php'),
+                file_get_contents(base_path('/routes/api.php')) ."\n". "Route::api('". strtolower(Str::plural($this->modelClass())) ."', \\App\\Http\\API\\". $this->argument('name') ."::class);"
+            );
+            $this->line('API endpoint ready at: /api/endpoint');
         }
     }
 
